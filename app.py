@@ -38,19 +38,6 @@ if uploaded_files:
 
     st.success(f"All files were uploaded successfully. Click on 'Document Embedding' to Continue.")
 
-llm = ChatGroq(api_key=groq_api_key, model="llama3-8b-8192")
-
-prompt = ChatPromptTemplate.from_template(
-    """
-Answer the questions based on the provided context.
-Please provide the most accurate response based in the question
-<context>
-{context}
-<context>
-Question:{input}
-"""
-)
-
 def create_vector_embeddings():
     if "vectors" not in st.session_state:
         st.session_state.embeddings=OpenAIEmbeddings(api_key=open_api_key)  ## Embeddings
@@ -69,6 +56,19 @@ user_prompt = st.text_input("Enter your query from the research papers")
 import time
 
 if user_prompt:
+    llm = ChatGroq(api_key=groq_api_key, model="llama3-8b-8192")
+
+    prompt = ChatPromptTemplate.from_template(
+        """
+    Answer the questions based on the provided context.
+    Please provide the most accurate response based in the question
+    <context>
+    {context}
+    <context>
+    Question:{input}
+    """
+    )
+    
     document_chain = create_stuff_documents_chain(llm, prompt)
     retriever = st.session_state.vectors.as_retriever()
     retrieval_chain = create_retrieval_chain(retriever, document_chain)
